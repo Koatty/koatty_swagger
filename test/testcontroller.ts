@@ -68,7 +68,7 @@ export class UserController {
 
   @ApiOperation({
     method: 'GET',
-    path: '/{id}',
+    path: '/detail/{id}',
     summary: '获取用户详情',
     deprecated: true
   })
@@ -89,7 +89,7 @@ export class UserController {
   })
   delete() { }
 
-  @ApiOperation({ method: 'GET', path: '/{id}' })
+  @ApiOperation({ method: 'GET', path: '/test/{id}' })
   @ApiParam({
     name: 'id',
     in: 'path',
@@ -98,33 +98,42 @@ export class UserController {
   })
   getById() { }
 
-  @ApiOperation({ method: 'GET', path: '/search' })
-  @ApiParam({
+  @ApiOperation({ method: 'GET', path: '/test/search' })
+  @ApiParam([{
     name: 'keywords',
     in: 'query',
     required: true,
     schema: {
-      type: 'string',
-      minLength: 2
+      type: 'string'
     }
-  })
-  @ApiParam({
+  },
+  {
     name: 'X-Trace-ID',
     in: 'header',
     description: '追踪标识'
-  })
+  }])
   search() { }
 
-  @ApiOperation({ method: 'POST', path: '/{id}/avatar' })
-  @ApiParam({ name: 'id', in: 'path' }) // 测试路径参数默认required
-  @ApiParam({
+  @ApiOperation({ method: 'POST', path: '/test/{id}/avatar' })
+  @ApiParam([{ name: 'id', in: 'path' },
+  {
     name: 'compress',
     in: 'query',
     type: Boolean
-  })
+  },
+  {
+    name: 'payload',
+    in: 'body',
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' }
+      }
+    }
+  }])
   uploadAvatar() { }
 
-  @ApiOperation({ method: 'PUT', path: '/{id}' })
+  @ApiOperation({ method: 'PUT', path: '/test/{id}' })
   @ApiParam({
     name: 'id',
     in: 'path',

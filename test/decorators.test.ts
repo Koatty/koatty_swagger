@@ -3,7 +3,7 @@ import { API_CONTROLLER_KEY } from '../src/decorators/controller';
 import { API_MODEL_KEY, ApiModel, getRegisteredModels } from '../src/decorators/model';
 import { API_OPERATION_KEY } from '../src/decorators/operation';
 import { API_PARAMETERS_KEY } from '../src/decorators/params';
-import { API_PROPERTIES_KEY } from '../src/decorators/property';
+import { API_PROPERTY_KEY } from '../src/decorators/property';
 import { TestController } from './testcontroller';
 import { CreateUserDto, UserDetailDto } from './testdto';
 
@@ -66,7 +66,7 @@ describe('装饰器元数据测试', () => {
   });
 
   test('DTO模型生成Schema', () => {
-    const props = Reflect.getMetadata(API_PROPERTIES_KEY, CreateUserDto);
+    const props = Reflect.getMetadata(API_PROPERTY_KEY, CreateUserDto);
     expect(props).toEqual([{ "format": "uuid", "name": "id", "type": "string" }, { "format": "date-time", "name": "createdAt", "type": "string" }, { "name": "name", "type": "string" },
     { "name": "age", "type": "string" }, { "$ref": "#/components/schemas/UserDetailDto", "name": "detail", "type": "object" }]);
     // expect(props[1]).toEqual({ name: 'age', type: 'integer' });

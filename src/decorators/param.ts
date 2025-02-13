@@ -3,13 +3,13 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-10 15:38:37
- * @LastEditTime: 2025-02-13 10:24:12
+ * @LastEditTime: 2025-02-13 15:07:03
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
 import { ParameterObject } from 'openapi3-ts/oas31';
 import 'reflect-metadata';
-import { getParameterNames, getTypeSchema } from '../swagger/utils';
+import { getParameterNames, getTypeSchema } from '../util/utils';
 
 interface ApiParamConfig {
   /** 参数名称 */
@@ -24,6 +24,8 @@ interface ApiParamConfig {
   type?: any;
   /** 自定义schema（优先级高于type） */
   schema?: Record<string, any>;
+  /** 参数格式 */
+  contentType?: string;
 }
 
 // 元数据存储键
@@ -34,14 +36,27 @@ export const API_PARAMETERS_KEY = 'swagger:parameters';
  * @param {ApiParamConfig[]} params
  * @return {*}
  */
-export const ApiParam = (paramsConfig: Partial<ApiParamConfig>[] = []): MethodDecorator => {
+export const ApiParam = (paramsConfig: ApiParamConfig | ApiParamConfig[]): MethodDecorator => {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const paramTypes = Reflect.getMetadata('design:paramtypes', target, propertyKey);
-    const parameterNames = getParameterNames(target[propertyKey]);
-
+    const paramTypes = Reflect.getMetadata('design:paramtypes', target, propertyKey) || [];
+    const parameterNames = getParameterNames(target[propertyKey]) || [];
+    if (!Array.isArray(paramsConfig)) {
+      paramsConfig = [paramsConfig];
+    }
+    if (paramTypes.length !== paramsConfig.length) {
+      for (let index = 0; index < paramsConfig.length; index++) {
+        const element = paramsConfig[index];
+        if (parameterNames[index] === element.name) {
+          continue;
+        }
+        paramTypes.push(element.type || String);
+        paramsConfig[index].required = true;
+      }
+    }
     const parameters: ParameterObject[] = paramTypes.map((type: any, index: number) => {
-      const config = paramsConfig[index] || {};
+      const config = (<Array<ApiParamConfig>>paramsConfig)[index] || {} as ApiParamConfig;
       const p: any = {
+        ...config,
         name: config.name || parameterNames[index] || `param${index}`,
         in: config.in || 'query',
         // required: config.required ?? true,

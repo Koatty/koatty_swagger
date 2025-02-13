@@ -3,7 +3,7 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-10 14:41:29
- * @LastEditTime: 2025-02-13 09:23:08
+ * @LastEditTime: 2025-02-13 15:59:15
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
@@ -14,9 +14,10 @@ import {
   SecuritySchemeObject
 } from 'openapi3-ts/oas31';
 import { API_CLASS_HEADERS_KEY, API_METHOD_HEADERS_KEY } from '../decorators/header';
-import { API_MODEL_KEY, getRegisteredModels } from '../decorators/model';
-import { API_PROPERTIES_KEY } from '../decorators/property';
-import { getMapOAuthFlow } from './utils';
+import { API_MODEL_KEY } from '../decorators/model';
+import { API_PROPERTY_KEY } from '../decorators/property';
+import { modelRegistry } from '../util/model-registry';
+import { getMapOAuthFlow } from '../util/utils';
 
 export class ComponentGenerator {
   private static visitedDTOs = new Set<Function>();
@@ -25,7 +26,7 @@ export class ComponentGenerator {
 
   static generate(controllers: any[]): ComponentsObject {
     this.resetState();
-    getRegisteredModels().forEach(model => this.processModel(model));
+    modelRegistry.listModels().forEach(model => this.processModel(model));
     controllers.forEach(controller => this.processController(controller));
     return this.buildComponents();
   }
@@ -41,14 +42,17 @@ export class ComponentGenerator {
     this.processMethodSecuritySchemes(controller);
   }
 
-  private static processModel(model: Function) {
-    const schema = this.generateModelSchema(model);
-    const modelName = this.getModelName(model);
+  private static processModel(modelEntries: {
+    target: Function,
+    schema: SchemaObject
+  }) {
+    const schema = modelEntries.schema;
+    const modelName = modelRegistry.getModelName(modelEntries.target);
     this.schemas[modelName] = schema;
   }
 
   private static generateModelSchema(model: Function): SchemaObject {
-    const properties = Reflect.getMetadata(API_PROPERTIES_KEY, model.prototype) || [];
+    const properties = Reflect.getMetadata(API_PROPERTY_KEY, model.prototype) || [];
     const required = [];
     const schema: SchemaObject = {
       type: 'object',
@@ -68,7 +72,7 @@ export class ComponentGenerator {
     if (parentModel !== Object &&
       Reflect.hasMetadata(API_MODEL_KEY, parentModel)) {
       schema.allOf = [
-        { $ref: `#/components/schemas/${this.getModelName(parentModel)}` }
+        { $ref: `#/components/schemas/${modelRegistry.getModelName(parentModel)}` }
       ];
     }
 
@@ -77,10 +81,6 @@ export class ComponentGenerator {
     }
 
     return schema;
-  }
-
-  private static getModelName(model: Function): string {
-    return Reflect.getMetadata(API_MODEL_KEY, model.prototype)?.name || model.name;
   }
 
   private static processClassSecuritySchemes(controller: any) {

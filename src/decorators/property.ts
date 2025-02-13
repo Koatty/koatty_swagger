@@ -3,26 +3,24 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-10 15:39:57
- * @LastEditTime: 2025-02-12 17:01:29
+ * @LastEditTime: 2025-02-13 17:23:55
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
 import 'reflect-metadata';
-import { getModelTypeSchema } from '../swagger/utils';
 
 interface PropertyOptions {
-  type?: string | Function;
-  format?: string;
-  example?: any;
-  description?: string;
+  type?: any;
   required?: boolean;
   isArray?: boolean;
+  format?: string;
+  description?: string;
+  example?: any;
   enum?: any[];
-  default?: any;
 }
 
 // 元数据存储键
-export const API_PROPERTIES_KEY = 'swagger:properties';
+export const API_PROPERTY_KEY = 'swagger:properties';
 
 /**
  * @description: Property装饰器
@@ -31,30 +29,28 @@ export const API_PROPERTIES_KEY = 'swagger:properties';
  */
 export const ApiProperty = (options: PropertyOptions = {}): PropertyDecorator => {
   return (target: any, propertyKey: string) => {
-    const properties = Reflect.getMetadata(API_PROPERTIES_KEY, target) || [];
+    // 关键修复：使用原型链末端实例存储元数据
+    const metadataTarget = target.constructor.prototype;
+
+    // 获取已存在的元数据（仅当前类）
+    const existingMetadata = Reflect.getOwnMetadata(API_PROPERTY_KEY, metadataTarget) || {};
     const designType = Reflect.getMetadata('design:type', target, propertyKey);
-    const itemType = Reflect.getMetadata('design:itemtype', target, propertyKey);
+    // 合并属性配置
 
-    const schema = getModelTypeSchema({
-      targetType: options.type || designType,
-      itemType,       // 新增数组元素类型
-      target,         // 传递类原型
-      propertyKey,     // 传递属性名
-      options
-    });
-    options.enum ? options.required = true : '';
-    const propConfig = [...properties, {
-      ...options,
-      name: propertyKey,
+    const schema = {
       type: options.type || designType,
-      ...schema
-    }];
+      required: options.required ?? false,
+      isArray: options.isArray || false,
+      ...options
+    };
+    schema.enum ? schema.required = true : '';
+    existingMetadata[propertyKey] = schema;
 
-
+    // 将元数据直接附加到当前类的原型
     Reflect.defineMetadata(
-      API_PROPERTIES_KEY,
-      propConfig,
-      target
+      API_PROPERTY_KEY,
+      existingMetadata,
+      metadataTarget
     );
   };
 }

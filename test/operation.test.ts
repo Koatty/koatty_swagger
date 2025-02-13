@@ -7,7 +7,7 @@ describe('@ApiOperation 装饰器', () => {
   test('基本路径和方法配置', () => {
     expect(paths['/users']).toHaveProperty('get');
     expect(paths['/users']).toHaveProperty('post');
-    expect(paths['/users/{id}']).toHaveProperty('get');
+    expect(paths['/users/{id}']).toHaveProperty('delete');
     expect(paths['/users/{id}/profile']).toHaveProperty('put');
   });
 
@@ -30,7 +30,7 @@ describe('@ApiOperation 装饰器', () => {
   });
 
   test('弃用标记处理', () => {
-    const detailOp = paths['/users/{id}'].get;
+    const detailOp = paths['/users/detail/{id}'].get;
     expect(detailOp.deprecated).toBe(true);
   });
 

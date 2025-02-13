@@ -3,7 +3,7 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-11 11:27:12
- * @LastEditTime: 2025-02-13 10:26:10
+ * @LastEditTime: 2025-02-13 14:41:57
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
@@ -16,7 +16,7 @@ import { API_CLASS_HEADERS_KEY, API_METHOD_HEADERS_KEY } from '../decorators/hea
 import { API_OPERATION_KEY } from '../decorators/operation';
 import { API_PARAMETERS_KEY } from '../decorators/param';
 import { API_RESPONSES_KEY } from '../decorators/response';
-import { getFullPath } from './utils';
+import { getBasedType, getFullPath } from '../util/utils';
 
 export class PathsProcessor {
   static process(controllers: any[]): OpenAPIObject['paths'] {
@@ -49,7 +49,7 @@ export class PathsProcessor {
           operationId: operation.operationId || `${controller.name}_${methodName}`,
           tags: this.processTags(operation.tags || [], classTags),
           parameters: [
-            ...this.processParameters(controller.prototype, methodName, normalHeaders),
+            ...this.processParameters(controller.prototype, methodName),
             ...this.convertHeaders(normalHeaders)
           ],
           security: this.processSecurity(securityHeaders),
@@ -94,38 +94,51 @@ export class PathsProcessor {
     return Array.from(new Set([...classTags, ...methodTags]));
   }
 
-  private static processParameters(target: any, method: string, classHeaders: any[]): ParameterObject[] {
-    const params = Reflect.getMetadata(API_PARAMETERS_KEY, target, method) || [];
+  private static processParameters(target: any, method: string): ParameterObject[] {
+    const params = (Reflect.getMetadata(API_PARAMETERS_KEY, target, method) || [])
+      ?.filter((p: any) => p.in !== 'body');
     return params.map((param: any) => ({
       name: param.name,
       in: param.in,
       description: param.description,
       required: param.required,
-      schema: param.schema || this.mapParamSchema(param),
+      schema: this.resolveParamSchema(param),
       // 其他参数属性...
     }));
   }
 
-  private static mapParamSchema(param: any) {
+  private static resolveParamSchema(param: any): any {
+    // 优先使用自定义schema
+    if (param.schema) return param.schema;
+    // 处理类型引用
     if (param.type) {
-      return {
-        type: this.mapType(param.type),
-        format: param.format,
-        example: param.example
-      };
+      // 注册DTO模型
+      if (typeof param.type === 'function') {
+        return { $ref: `#/components/schemas/${param.type}` };
+      }
+      // 处理数组类型
+      if (Array.isArray(param.type)) {
+        return {
+          type: 'array',
+          items: this.resolveParamSchema({ type: param.type[0] })
+        };
+      }
+      // 基本类型映射
+      return getBasedType(param.type);
     }
-    return param.schema;
+    // 默认字符串类型
+    return { type: 'string' };
   }
 
-  private static processRequestBody(target: any, method: string): RequestBodyObject | undefined {
-    const bodyParams = Reflect.getMetadata(API_PARAMETERS_KEY, target, method)
+  private static processRequestBody(target: any, method: string): RequestBodyObject {
+    const bodyParams = (Reflect.getMetadata(API_PARAMETERS_KEY, target, method) || [])
       ?.filter((p: any) => p.in === 'body');
+    if (!bodyParams?.length) return {} as RequestBodyObject;
 
-    if (!bodyParams?.length) return undefined;
-
+    const contentType = bodyParams[0]?.contentType || 'application/json';
     return {
       content: {
-        'application/json': {
+        [contentType]: {
           schema: this.resolveBodySchema(bodyParams)
         }
       }
@@ -158,15 +171,15 @@ export class PathsProcessor {
     }));
   }
 
-  private static mapType(type: any): string {
-    const typeMap: Record<string, string> = {
-      String: 'string',
-      Number: 'number',
-      Boolean: 'boolean',
-      Date: 'string',
-      Object: 'object',
-      Array: 'array'
-    };
-    return typeMap[type.name] || 'string';
-  }
+  // private static mapType(type: any): string {
+  //   const typeMap: Record<string, string> = {
+  //     String: 'string',
+  //     Number: 'number',
+  //     Boolean: 'boolean',
+  //     Date: 'string',
+  //     Object: 'object',
+  //     Array: 'array'
+  //   };
+  //   return typeMap[type.name] || 'string';
+  // }
 }
