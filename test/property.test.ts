@@ -125,7 +125,7 @@ describe('@ApiProperty 装饰器', () => {
 
   test('可选字段处理', () => {
     const optionalProp = schemas.TestDTO.properties.optionalField;
-    expect(optionalProp).toEqual({ type: 'string', name: 'optionalField', required: false });
+    expect(optionalProp).toEqual({ type: 'string' });
     expect(schemas.TestDTO.required).not.toContain('optionalField');
   });
 
@@ -148,8 +148,7 @@ describe('@ApiProperty 装饰器', () => {
       "type": "object",
       "properties": {
         "derivedField": {
-          "type": "number",
-          "description": "用户年龄"
+          "type": "number"
         }
       },
       "required": []

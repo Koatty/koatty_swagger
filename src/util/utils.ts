@@ -3,7 +3,7 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-11 11:07:11
- * @LastEditTime: 2025-02-13 17:50:21
+ * @LastEditTime: 2025-02-13 18:28:22
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
@@ -185,13 +185,11 @@ export function getModelTypeSchema(context: TypeSchemaContext): SchemaObject {
     if (!actualItemType) {
       actualItemType = String;
     }
-    const opt = { ...options, isArray: false };
     return {
       type: 'array',
       items: getModelTypeSchema({
         targetType: actualItemType,
         target,
-        options: opt,
         propertyKey
       })
     };

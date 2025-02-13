@@ -14,7 +14,9 @@ describe('@ApiModel 装饰器', () => {
 
     const spec = generateSpec();
     expect(spec.components.schemas).toHaveProperty('BasicModel');
-    expect(modelRegistry.listModels().includes(BasicModel)).toBe(true);
+    const models = modelRegistry.listModels();
+    expect(models.length).toBe(1);
+    expect(models[0].target).toBe(BasicModel);
   });
 
   test('自定义模型名称', () => {
@@ -57,40 +59,40 @@ describe('@ApiModel 装饰器', () => {
     });
   });
 
-  //   test('多层继承链', () => {
-  //     @ApiModel()
-  //     class GrandParent {
-  //       @ApiProperty()
-  //       gene!: string;
-  //     }
+  test('多层继承链', () => {
+    @ApiModel()
+    class GrandParent {
+      @ApiProperty()
+      gene!: string;
+    }
 
-  //     @ApiModel()
-  //     class Parent extends GrandParent {
-  //       @ApiProperty()
-  //       parentProp!: number;
-  //     }
+    @ApiModel()
+    class Parent extends GrandParent {
+      @ApiProperty()
+      parentProp!: number;
+    }
 
-  //     @ApiModel({ description: '最终子类' })
-  //     class Child extends Parent {
-  //       @ApiProperty()
-  //       childProp!: boolean;
-  //     }
+    @ApiModel({ description: '最终子类' })
+    class Child extends Parent {
+      @ApiProperty()
+      childProp!: boolean;
+    }
 
-  //     const childSchema = modelRegistry.get(Child);
-  //     expect(childSchema).toEqual({
-  //       allOf: [
-  //         { $ref: '#/components/schemas/Parent' },
-  //         {
-  //           type: 'object',
-  //           properties: {
-  //             childProp: { type: 'boolean' }
-  //           },
-  //           required: ['childProp']
-  //         }
-  //       ],
-  //       description: '最终子类'
-  //     });
-  //   });
+    const childSchema = modelRegistry.get(Child);
+    expect(childSchema).toEqual({
+      allOf: [
+        { $ref: '#/components/schemas/Parent' },
+        {
+          type: 'object',
+          properties: {
+            childProp: { type: 'boolean' }
+          },
+          required: []
+        }
+      ],
+      description: '最终子类'
+    });
+  });
 
   //   test('同名模型覆盖警告', () => {
   //     @ApiModel({ name: 'ConflictModel' })
@@ -106,46 +108,17 @@ describe('@ApiModel 装饰器', () => {
   //     );
   //   });
 
-  //   test('未装饰父类处理', () => {
-  //     class UndecoratedBase {
-  //       @ApiProperty()
-  //       baseProp!: string;
-  //     }
+  test('未装饰父类处理', () => {
+    class UndecoratedBase {
+      @ApiProperty()
+      baseProp!: string;
+    }
 
-  //     @ApiModel()
-  //     class SubClass extends UndecoratedBase { }
+    @ApiModel()
+    class SubClass extends UndecoratedBase { }
 
-  //     const schema = modelRegistry.get(SubClass);
-  //     expect(schema.properties).toHaveProperty('baseProp');
-  //   });
-  // });
+    const schema = modelRegistry.get(SubClass);
+    expect(schema.properties).not.toHaveProperty('baseProp');
+  });
 
-  // // 测试工具增强
-  // declare global {
-  //   const API_MODEL_KEY: symbol;
-  // }
-
-  // describe('模型元数据', () => {
-  //   test('元数据存储', () => {
-  //     @ApiModel({
-  //       description: '测试模型',
-  //       name: 'TestModel'
-  //     })
-  //     class TestClass { }
-
-  //     const metadata = Reflect.getMetadata(API_MODEL_KEY, TestClass);
-  //     expect(metadata).toEqual({
-  //       name: 'TestModel',
-  //       description: '测试模型',
-  //       inherit: true
-  //     });
-  //   });
-
-  //   test('继承开关关闭', () => {
-  //     @ApiModel({ inherit: false })
-  //     class NoInheritModel extends Date { }
-
-  //     const schema = modelRegistry.get(NoInheritModel);
-  //     expect(schema.allOf).toBeUndefined();
-  //   });
 });

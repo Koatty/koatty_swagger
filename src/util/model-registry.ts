@@ -23,7 +23,7 @@ export class ModelRegistry {
     // 处理名称冲突
     if (this.nameMapping.has(modelName)) {
       const existing = this.nameMapping.get(modelName)!;
-      console.warn(`模型名称冲突: ${modelName} 已由 ${existing.name} 注册`);
+      // console.warn(`模型名称冲突: ${modelName} 已由 ${existing.name} 注册`);
     }
 
     this.models.set(target, schema);
@@ -89,7 +89,7 @@ export class ModelRegistry {
     const parent = Object.getPrototypeOf(target);
 
     const schema: SchemaObject = {
-      type: 'object',
+      // type: 'object',
       description: meta.description
     };
 
@@ -128,9 +128,10 @@ export class ModelRegistry {
       target.prototype
     ) || {};
 
-    for (const [propertyName, config] of Object.entries(props)) {
-      properties[propertyName] = this.createPropertySchema(target.prototype, propertyName, config);
 
+    for (const [propertyName, config] of Object.entries(props)) {
+      const options = config || {};
+      properties[propertyName] = this.createPropertySchema(target.prototype, propertyName, options);
       if ((<any>config).required) {
         required.push(propertyName);
       }
@@ -147,50 +148,18 @@ export class ModelRegistry {
     if (options.schema) {
       return { ...options.schema };
     }
-
-    console.log('options :', options, "/n propertyKey:", propertyKey, "/n schema:", getModelTypeSchema({ targetType: options.type, target, propertyKey, options }))
-
-    const schema = getModelTypeSchema({ targetType: options.type, target, propertyKey, options });
-    options.format ? schema.format = options.format : '';
-    options.description ? schema.description = options.description : '';
-    options.example ? schema.example = options.example : '';
-    options.enum ? schema.enum = options.enum : '';
-    options.required ? schema.required = options.required : '';
-
-    return schema;
+    // 处理类型引用
+    const type = options.type;
+    const schema = getModelTypeSchema({ targetType: type, target, propertyKey, options });
+    const opt: any = {};
+    options.required ? opt.required = options.required : null;
+    options.format ? opt.format = options.format : null;
+    options.description ? opt.description = options.description : null;
+    options.example ? opt.example = options.example : null;
+    options.enum ? opt.enum = options.enum : null;
+    return { ...opt, ...schema };
   }
 
-  // private createArraySchema(config: any): any {
-  //   const items = config.type !== Array ? this.createPropertySchema({
-  //     ...config,
-  //     type: config.type[0],
-  //     isArray: false
-  //   }) : { type: 'string' }; // 默认数组元素类型
-
-  //   return {
-  //     type: 'array',
-  //     items,
-  //     description: config.description
-  //   };
-  // }
-
-  // private createModelSchema(config: any): any {
-  //   const modelType = config.type;
-  //   if (!this.models.has(modelType)) {
-  //     // throw new Error(`未注册的模型类型: ${modelType.name}`);
-  //   }
-
-  //   return {
-  //     $ref: `#/components/schemas/${this.getModelName(modelType)}`
-  //   };
-  // }
-
-  // private getBaseSchema(target: Function): SchemaObject | null {
-  //   const parent = Object.getPrototypeOf(target);
-  //   if (!parent || parent === Function.prototype) return null;
-
-  //   return this.models.get(parent) || null;
-  // }
 }
 
 // 单例实例
