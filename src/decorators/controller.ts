@@ -8,11 +8,10 @@
  * @Copyright (c): <richenlin(at)gmail.com>
  */
 import 'reflect-metadata';
+import { API_CONTROLLER_KEY } from '../util/key-type';
 
 // 全局存储所有注册的模型
 const controllerRegistry = new Set<Function>();
-// 元数据存储键
-export const API_CONTROLLER_KEY = 'swagger:controller';
 
 interface ControllerOptions {
   name?: string;

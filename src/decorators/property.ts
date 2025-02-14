@@ -8,6 +8,7 @@
  * @Copyright (c): <richenlin(at)gmail.com>
  */
 import 'reflect-metadata';
+import { API_PROPERTY_KEY } from '../util/key-type';
 
 interface PropertyOptions {
   type?: any;
@@ -18,9 +19,6 @@ interface PropertyOptions {
   example?: any;
   enum?: any[];
 }
-
-// 元数据存储键
-export const API_PROPERTY_KEY = 'swagger:properties';
 
 /**
  * @description: Property装饰器

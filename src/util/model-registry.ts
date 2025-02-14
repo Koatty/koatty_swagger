@@ -4,7 +4,6 @@ import { API_PROPERTY_KEY } from '../decorators/property';
 import { getModelTypeSchema } from './utils';
 
 type SchemaObject = OpenAPIV3.SchemaObject;
-type SchemaType = 'string' | 'number' | 'integer' | 'boolean' | 'array' | 'object';
 
 export class ModelRegistry {
   private models = new Map<Function, SchemaObject>();
@@ -23,7 +22,7 @@ export class ModelRegistry {
     // 处理名称冲突
     if (this.nameMapping.has(modelName)) {
       const existing = this.nameMapping.get(modelName)!;
-      // console.warn(`模型名称冲突: ${modelName} 已由 ${existing.name} 注册`);
+      throw new Error(`Model name conflict: ${modelName} has been registered by ${existing.name}.`);
     }
 
     this.models.set(target, schema);
@@ -43,7 +42,7 @@ export class ModelRegistry {
 
   getRef(target: Function): SchemaObject {
     if (!this.models.has(target)) {
-      throw new Error(`模型未注册: ${target.name}`);
+      throw new Error(`Model ${target.name} not registered`);
     }
     return { $ref: `#/components/schemas/${this.getModelName(target)}` } as SchemaObject;
   }

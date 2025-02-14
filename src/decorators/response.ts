@@ -3,61 +3,44 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-10 15:45:51
- * @LastEditTime: 2025-02-11 16:16:36
+ * @LastEditTime: 2025-02-14 11:20:18
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
 import { SchemaObject } from 'openapi3-ts/oas31';
 import 'reflect-metadata';
+import { API_RESPONSES_KEY } from '../util/key-type';
+import { resolveSchema, SchemaDefinition } from '../util/response';
 
 
-interface ResponseOptions<T> {
-  type?: new () => T;
-  isArray?: boolean;
+interface ResponseOptions {
   contentType?: string;
-  schema?: SchemaObject;
+  isArray?: boolean;
+  schema?: SchemaDefinition | SchemaObject;
 }
 
-
-// 元数据存储键
-export const API_RESPONSES_KEY = 'swagger:responses';
 
 /**
  * @description: ApiResponse装饰器
  * @return {*}
  */
-export const ApiResponse = <T = any>(
+export const ApiResponse = (
   statusCode: number,
   description: string,
-  options?: ResponseOptions<T>
+  options?: ResponseOptions
 ): MethodDecorator => {
   return (target: any, propertyKey: string) => {
     const responses = Reflect.getMetadata(API_RESPONSES_KEY, target, propertyKey) || {};
-
+    options?.contentType ? options.contentType : 'application/json';
     responses[statusCode] = {
       description,
-      content: options?.contentType ? {
+      content: {
         [options.contentType]: {
-          schema: resolveSchema(options)
+          schema: resolveSchema(options.schema, options.isArray)
         }
-      } : undefined
+      }
     };
 
     Reflect.defineMetadata(API_RESPONSES_KEY, responses, target, propertyKey);
   };
-}
-
-/**
- * @description: 解析schema
- * @param {ResponseOptions} options
- * @return {*}
- */
-function resolveSchema<T>(options: ResponseOptions<T>) {
-  if (options.schema) return options.schema;
-  if (options.type) {
-    return options.isArray
-      ? { type: 'array', items: { $ref: `#/components/schemas/${options.type.name}` } }
-      : { $ref: `#/components/schemas/${options.type.name}` };
-  }
-  return { type: 'object' };
 }

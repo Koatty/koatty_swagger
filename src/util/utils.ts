@@ -3,7 +3,7 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-11 11:07:11
- * @LastEditTime: 2025-02-13 18:28:22
+ * @LastEditTime: 2025-02-14 11:14:25
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
@@ -131,7 +131,7 @@ export const getBasedType = (input: any): SchemaObject => {
  * @param {any} targetType
  * @return {*}
  */
-export const hasBasedType = (targetType: any): boolean => {
+export const isBasedType = (targetType: any): boolean => {
   return basedTypeMap.has(targetType.name) || basedTypeMap.has(targetType);
 }
 
@@ -153,7 +153,7 @@ export function getTypeSchema(targetType: any): SchemaObject {
   }
 
   // 处理自定义类/DTO
-  if (targetType?.prototype && !hasBasedType(targetType)) {
+  if (targetType?.prototype && !isBasedType(targetType)) {
     return { $ref: `#/components/schemas/${targetType.name}` } as SchemaObject;
   }
 
@@ -196,7 +196,7 @@ export function getModelTypeSchema(context: TypeSchemaContext): SchemaObject {
   }
 
   // 处理DTO引用
-  if (typeof targetType === 'function' && !hasBasedType(targetType)) {
+  if (typeof targetType === 'function' && !isBasedType(targetType)) {
     return { type: "object", $ref: `#/components/schemas/${targetType.name}` } as SchemaObject;
   }
 

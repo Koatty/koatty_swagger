@@ -8,9 +8,7 @@
  * @Copyright (c): <richenlin(at)gmail.com>
  */
 import 'reflect-metadata';
-
-// 元数据存储键
-export const API_OPERATION_KEY = 'swagger:operation';
+import { API_OPERATION_KEY } from '../util/key-type';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
 

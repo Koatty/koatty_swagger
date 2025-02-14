@@ -1,6 +1,7 @@
 
-import { API_MODEL_KEY, ApiModel } from '../src/decorators/model';
+import { ApiModel } from '../src/decorators/model';
 import { ApiProperty } from '../src/decorators/property';
+import { API_MODEL_KEY } from '../src/util/key-type';
 import { modelRegistry } from '../src/util/model-registry';
 import { generateSpec } from './test-utils';
 

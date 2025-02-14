@@ -11,6 +11,7 @@ import {
   OAuthFlowObject
 } from 'openapi3-ts/oas31';
 import 'reflect-metadata';
+import { API_CLASS_HEADERS_KEY, API_METHOD_HEADERS_KEY } from '../util/key-type';
 
 // 增强型类型定义（处理装饰器配置）
 export type OAuthFlowConfig = Omit<OAuthFlowObject, 'scopes'> & {
@@ -38,11 +39,6 @@ export interface SecurityScheme {
   bearerFormat?: string;
   flows?: OAuthFlowsConfig;
 }
-
-
-// 元数据存储键
-export const API_METHOD_HEADERS_KEY = 'swagger:method:headers';
-export const API_CLASS_HEADERS_KEY = 'swagger:class:headers';
 
 /**
  * @description: Header装饰器

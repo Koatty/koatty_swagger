@@ -8,10 +8,8 @@
  * @Copyright (c): <richenlin(at)gmail.com>
  */
 
+import { API_MODEL_KEY } from "../util/key-type";
 import { modelRegistry } from "../util/model-registry";
-
-// 元数据存储键
-export const API_MODEL_KEY = 'swagger:model';
 
 export function ApiModel(options: {
   name?: string;

@@ -3,7 +3,7 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-11 11:27:12
- * @LastEditTime: 2025-02-13 14:41:57
+ * @LastEditTime: 2025-02-14 11:22:25
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
@@ -11,11 +11,7 @@ import {
   OpenAPIObject, OperationObject, ParameterObject, PathItemObject, RequestBodyObject,
   SecurityRequirementObject
 } from 'openapi3-ts/oas31';
-import { API_CONTROLLER_KEY } from '../decorators/controller';
-import { API_CLASS_HEADERS_KEY, API_METHOD_HEADERS_KEY } from '../decorators/header';
-import { API_OPERATION_KEY } from '../decorators/operation';
-import { API_PARAMETERS_KEY } from '../decorators/param';
-import { API_RESPONSES_KEY } from '../decorators/response';
+import { API_CLASS_HEADERS_KEY, API_CONTROLLER_KEY, API_METHOD_HEADERS_KEY, API_OPERATION_KEY, API_PARAMETERS_KEY, API_RESPONSES_KEY } from '../util/key-type';
 import { getBasedType, getFullPath } from '../util/utils';
 
 export class PathsProcessor {
@@ -54,7 +50,7 @@ export class PathsProcessor {
           ],
           security: this.processSecurity(securityHeaders),
           requestBody: this.processRequestBody(controller.prototype, methodName),
-          responses: Reflect.getMetadata(API_RESPONSES_KEY, controller.prototype, methodName) || {},
+          responses: this.processResponse(controller.prototype, methodName),
         };
 
         pathItem[operation.method] = operationObject;
@@ -63,6 +59,10 @@ export class PathsProcessor {
     });
 
     return paths;
+  }
+
+  private static processResponse(controller: any, methodName: string) {
+    return Reflect.getMetadata(API_RESPONSES_KEY, controller.prototype, methodName) || {};
   }
 
   private static splitSecurityHeaders(headers: any[]): [any[], any[]] {

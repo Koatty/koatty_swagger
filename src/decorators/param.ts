@@ -3,12 +3,13 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-10 15:38:37
- * @LastEditTime: 2025-02-13 15:07:03
+ * @LastEditTime: 2025-02-14 10:18:24
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
 import { ParameterObject } from 'openapi3-ts/oas31';
 import 'reflect-metadata';
+import { API_PARAMETERS_KEY } from '../util/key-type';
 import { getParameterNames, getTypeSchema } from '../util/utils';
 
 interface ApiParamConfig {
@@ -28,9 +29,6 @@ interface ApiParamConfig {
   contentType?: string;
 }
 
-// 元数据存储键
-export const API_PARAMETERS_KEY = 'swagger:parameters';
-
 /**
  * @description: 参数装饰器
  * @param {ApiParamConfig[]} params
@@ -38,7 +36,7 @@ export const API_PARAMETERS_KEY = 'swagger:parameters';
  */
 export const ApiParam = (paramsConfig: ApiParamConfig | ApiParamConfig[]): MethodDecorator => {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const paramTypes = Reflect.getMetadata('design:paramtypes', target, propertyKey) || [];
+    const paramTypes = Reflect.getMetadata(API_PARAMETERS_KEY, target, propertyKey) || [];
     const parameterNames = getParameterNames(target[propertyKey]) || [];
     if (!Array.isArray(paramsConfig)) {
       paramsConfig = [paramsConfig];
@@ -67,7 +65,6 @@ export const ApiParam = (paramsConfig: ApiParamConfig | ApiParamConfig[]): Metho
       config.description ? p.description = config.description : '';
       return p;
     });
-
 
     Reflect.defineMetadata(API_PARAMETERS_KEY, parameters, target, propertyKey);
   };

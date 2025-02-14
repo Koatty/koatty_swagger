@@ -3,7 +3,7 @@
  * @Usage: 
  * @Author: richen
  * @Date: 2025-02-10 14:41:29
- * @LastEditTime: 2025-02-13 15:59:15
+ * @LastEditTime: 2025-02-14 10:51:02
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
@@ -13,9 +13,8 @@ import {
   SchemaObject,
   SecuritySchemeObject
 } from 'openapi3-ts/oas31';
-import { API_CLASS_HEADERS_KEY, API_METHOD_HEADERS_KEY } from '../decorators/header';
-import { API_MODEL_KEY } from '../decorators/model';
-import { API_PROPERTY_KEY } from '../decorators/property';
+
+import { API_CLASS_HEADERS_KEY, API_METHOD_HEADERS_KEY, API_MODEL_KEY, API_PROPERTY_KEY } from '../util/key-type';
 import { modelRegistry } from '../util/model-registry';
 import { getMapOAuthFlow } from '../util/utils';
 
