@@ -53,12 +53,12 @@
   "dependencies": {
     "koa-compose": "^4.1.0",
     "koa-mount": "^4.0.0",
-    "koatty_lib": "^1.x.x",
+    "koatty_lib": "workspace:*",
     "openapi3-ts": "^4.4.0"
   },
   "peerDependencies": {
     "koa": "^2.x.x",
     "koatty": "^3.x.x",
-    "koatty_lib": "^1.x.x"
+    "koatty_lib": "workspace:*"
   }
 }
