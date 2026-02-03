@@ -58,7 +58,7 @@
   },
   "peerDependencies": {
     "koa": "^2.x.x",
-    "koatty": "^3.x.x",
+    "koatty": "workspace:*",
     "koatty_lib": "workspace:*"
   }
 }

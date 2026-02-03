@@ -1,6 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { API_MODEL_KEY } from '../decorators/model';
-import { API_PROPERTY_KEY } from '../decorators/property';
+import { API_MODEL_KEY, API_PROPERTY_KEY } from './key-type';
 import { getModelTypeSchema } from './utils';
 
 type SchemaObject = OpenAPIV3.SchemaObject;
