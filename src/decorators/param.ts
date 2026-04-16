@@ -7,7 +7,7 @@
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
-import { ParameterObject } from 'openapi3-ts/oas31';
+import { ParameterObject } from 'openapi3-ts/oas30';
 import 'reflect-metadata';
 import { API_PARAMETERS_KEY } from '../util/key-type';
 import { getParameterNames, getTypeSchema } from '../util/utils';

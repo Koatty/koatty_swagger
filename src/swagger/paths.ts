@@ -10,7 +10,7 @@
 import {
   OpenAPIObject, OperationObject, ParameterObject, PathItemObject, RequestBodyObject,
   SecurityRequirementObject
-} from 'openapi3-ts/oas31';
+} from 'openapi3-ts/oas30';
 import { API_CLASS_HEADERS_KEY, API_CONTROLLER_KEY, API_METHOD_HEADERS_KEY, API_OPERATION_KEY, API_PARAMETERS_KEY, API_RESPONSES_KEY } from '../util/key-type';
 import { getBasedType, getFullPath } from '../util/utils';
 

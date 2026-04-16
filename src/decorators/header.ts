@@ -9,7 +9,7 @@
  */
 import {
   OAuthFlowObject
-} from 'openapi3-ts/oas31';
+} from 'openapi3-ts/oas30';
 import 'reflect-metadata';
 import { API_CLASS_HEADERS_KEY, API_METHOD_HEADERS_KEY } from '../util/key-type';
 

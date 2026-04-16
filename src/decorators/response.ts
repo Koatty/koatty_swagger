@@ -7,7 +7,7 @@
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
-import { SchemaObject } from 'openapi3-ts/oas31';
+import { SchemaObject } from 'openapi3-ts/oas30';
 import 'reflect-metadata';
 import { API_RESPONSES_KEY } from '../util/key-type';
 import { resolveSchema, SchemaDefinition } from '../util/response';
@@ -31,11 +31,12 @@ export const ApiResponse = (
 ): MethodDecorator => {
   return (target: any, propertyKey: string) => {
     const responses = Reflect.getMetadata(API_RESPONSES_KEY, target, propertyKey) || {};
-    options?.contentType ? options.contentType : 'application/json';
+    options = options ?? {};
+    const contentType = options.contentType ?? 'application/json';
     responses[statusCode] = {
       description,
       content: {
-        [options.contentType]: {
+        [contentType]: {
           schema: resolveSchema(options.schema, options.isArray)
         }
       }

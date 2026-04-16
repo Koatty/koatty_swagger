@@ -7,7 +7,7 @@
  * @License: BSD (3-Clause)
  * @Copyright (c): <richenlin(at)gmail.com>
  */
-import { SchemaObject } from 'openapi3-ts/oas31';
+import { SchemaObject } from 'openapi3-ts/oas30';
 import 'reflect-metadata';
 import { getBasedType, isBasedType } from './utils';
 

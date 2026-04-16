@@ -12,7 +12,7 @@ import {
   OAuthFlowsObject,
   SchemaObject,
   SecuritySchemeObject
-} from 'openapi3-ts/oas31';
+} from 'openapi3-ts/oas30';
 
 import { API_CLASS_HEADERS_KEY, API_METHOD_HEADERS_KEY, API_MODEL_KEY, API_PROPERTY_KEY } from '../util/key-type';
 import { modelRegistry } from '../util/model-registry';

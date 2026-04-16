@@ -8,7 +8,7 @@
  * @Copyright (c): <richenlin(at)gmail.com>
  */
 
-import { OAuthFlowObject, SchemaObject } from "openapi3-ts/oas31";
+import { OAuthFlowObject, SchemaObject } from "openapi3-ts/oas30";
 
 /**
  * @description: 
