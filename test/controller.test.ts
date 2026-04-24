@@ -1,4 +1,4 @@
-import { API_CONTROLLER_KEY } from '../src/decorators/controller';
+import { API_CONTROLLER_KEY } from '../src/util/key-type';
 import { generateSpec } from './test-utils';
 import { UserController } from './testcontroller';
 

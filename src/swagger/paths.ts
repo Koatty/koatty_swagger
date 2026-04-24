@@ -62,7 +62,7 @@ export class PathsProcessor {
   }
 
   private static processResponse(controller: any, methodName: string) {
-    return Reflect.getMetadata(API_RESPONSES_KEY, controller.prototype, methodName) || {};
+    return Reflect.getMetadata(API_RESPONSES_KEY, controller, methodName) || {};
   }
 
   private static splitSecurityHeaders(headers: any[]): [any[], any[]] {
