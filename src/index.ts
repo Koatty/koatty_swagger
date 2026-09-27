@@ -26,6 +26,11 @@ export interface SwaggerConfig {
   jsonPath?: string;
   uiPath?: string;
   cdnBase?: string;
+  /**
+   * Whether the swagger middleware (json endpoint + UI) is mounted.
+   * Defaults to `NODE_ENV !== 'production'` (SEC-14: disabled by default in production).
+   */
+  enabled?: boolean;
 }
 
 /**
@@ -38,12 +43,14 @@ const defaultOptions: SwaggerConfig = {
   jsonPath: 'swagger.json',
   uiPath: '/swagger-ui',
   cdnBase: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5',
-  servers: [{ url: 'http://api.example.com' }]
+  servers: [{ url: 'http://api.example.com' }],
+  // SEC-14: swagger endpoints are disabled by default in production environments
+  enabled: process.env.NODE_ENV !== 'production'
 };
 
 /**
  * Swagger Middleware
- * 
+ *
  * @export
  * @param {OptionsInterface} options
  * @param {Application} app
@@ -51,6 +58,20 @@ const defaultOptions: SwaggerConfig = {
  */
 export function KoattySwagger(options: SwaggerConfig, app: Koatty): Koa.Middleware {
   const opt = { ...defaultOptions, ...options };
+
+  // SEC-14: when disabled (default in production), do not mount any swagger
+  // endpoints and do not write the OpenAPI document to disk
+  if (!opt.enabled) {
+    return async (_ctx: Koa.Context, next: Koa.Next) => {
+      await next();
+    };
+  }
+
+  // SEC-14: warn loudly when swagger is explicitly enabled in production
+  if (options.enabled === true && process.env.NODE_ENV === 'production') {
+    console.warn('[koatty_swagger] WARN: Swagger middleware is explicitly enabled in production environment, API documentation will be publicly exposed.');
+  }
+
   // 生成完整文档（缓存结果）
   const doc = generateOpenAPIDoc(opt);
 
