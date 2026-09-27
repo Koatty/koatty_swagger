@@ -1,6 +1,6 @@
 {
   "name": "koatty_swagger",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Koatty Extension Project",
   "scripts": {
     "build": "del-cli --force dist && tsc",
@@ -60,6 +60,6 @@
   "peerDependencies": {
     "koa": "^2.x.x",
     "koatty": "workspace:*",
-    "koatty_lib": "^1.5.0"
+    "koatty_lib": "^1.6.0"
   }
 }
