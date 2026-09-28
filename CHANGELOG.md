@@ -1,5 +1,12 @@
 # koatty_swagger
 
+## 3.0.0
+
+### Patch Changes
+
+- Updated dependencies
+  - koatty@4.4.0
+
 ## 2.0.3
 
 ### Patch Changes
