@@ -55,6 +55,12 @@ describe('SEC-14: swagger enabled switch', () => {
     return { middleware, ctx, next, warnSpy };
   }
 
+  it('KOATTY_ENV production overrides NODE_ENV development', async () => {
+    const previous = process.env.KOATTY_ENV;
+    try { process.env.KOATTY_ENV = 'production'; const { ctx, next } = await buildMiddlewareInEnv('development', {}); expect(ctx.body).toBeUndefined(); expect(next).toHaveBeenCalledTimes(1); }
+    finally { if (previous === undefined) delete process.env.KOATTY_ENV; else process.env.KOATTY_ENV = previous; }
+  });
+
   it('production: endpoints are NOT mounted by default and no WARN is emitted', async () => {
     const { ctx, next, warnSpy } = await buildMiddlewareInEnv('production', {});
 

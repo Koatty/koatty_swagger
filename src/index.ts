@@ -11,7 +11,7 @@ import { writeFile } from "fs/promises";
 import Koa from "koa";
 import compose from 'koa-compose';
 import mount from 'koa-mount';
-import { Koatty } from "koatty";
+import { Koatty, resolveProfileName } from "koatty";
 import { OpenAPIObject } from "openapi3-ts/oas30";
 import { ComponentGenerator } from "./swagger/components";
 import { PathsProcessor } from "./swagger/paths";
@@ -45,7 +45,7 @@ const defaultOptions: SwaggerConfig = {
   cdnBase: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5',
   servers: [{ url: 'http://api.example.com' }],
   // SEC-14: swagger endpoints are disabled by default in production environments
-  enabled: process.env.NODE_ENV !== 'production'
+  enabled: false
 };
 
 /**
@@ -57,7 +57,7 @@ const defaultOptions: SwaggerConfig = {
  * @returns {*}  {Koa.Middleware}
  */
 export function KoattySwagger(options: SwaggerConfig, app: Koatty): Koa.Middleware {
-  const opt = { ...defaultOptions, ...options };
+  const opt = { ...defaultOptions, enabled: (app as any)?.security?.name ? (app as any).security.name !== 'strict' : resolveProfileName() !== 'strict', ...options };
 
   // SEC-14: when disabled (default in production), do not mount any swagger
   // endpoints and do not write the OpenAPI document to disk
@@ -68,7 +68,7 @@ export function KoattySwagger(options: SwaggerConfig, app: Koatty): Koa.Middlewa
   }
 
   // SEC-14: warn loudly when swagger is explicitly enabled in production
-  if (options.enabled === true && process.env.NODE_ENV === 'production') {
+  if (options.enabled === true && resolveProfileName() === 'strict') {
     console.warn('[koatty_swagger] WARN: Swagger middleware is explicitly enabled in production environment, API documentation will be publicly exposed.');
   }
 
