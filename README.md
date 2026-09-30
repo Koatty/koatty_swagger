@@ -10,6 +10,8 @@ npm install koatty_swagger reflect-metadata
 
 > **Note**: `reflect-metadata` is required as a peer dependency for decorator metadata support.
 
+> **v4.0**: production/default enablement is resolved through the shared security profile resolver (`KOATTY_ENV` takes precedence over `NODE_ENV`), so `KOATTY_ENV=production` without `NODE_ENV` now disables Swagger by default exactly like the framework does. Override explicitly with `swagger.enabled` if needed.
+
 ## Quick Start
 
 ### 1. Register the Middleware
